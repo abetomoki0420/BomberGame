@@ -1,0 +1,44 @@
+.field {
+  display: flex;
+  height: 550px;
+  width: 550px;
+  flex-wrap: wrap;
+  overflow: hidden;
+}
+
+.tile {
+  height: 50px;
+  width: 50px;
+  background: rgb(0, 255, 0);
+  text-align: center;
+  line-height: 50px;
+  font-size: 2rem;
+}
+
+.player {
+  background: transparent;
+}
+
+.player::after {
+  content: '😺'
+}
+
+.bomb::after {
+  content: '💣'
+}
+
+.block {
+  background: gray;
+}
+
+.block::after {
+  content: '壁'
+}
+
+.fire {
+  background: transparent;
+}
+
+.fire::after {
+  content: '🔥';
+}
