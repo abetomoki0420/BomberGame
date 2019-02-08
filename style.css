@@ -16,6 +16,8 @@
 }
 
 .player {
+  height: 100%;
+  width: 100%;
   background: transparent;
 }
 
@@ -23,19 +25,56 @@
   content: '😺'
 }
 
+@keyframes beat {
+  0% {
+    transform: scale(0.9, 0.9);
+  }
+
+  100% {
+    transform: scale(1.1, 1.1);
+  }
+}
+
+.bomb {
+  animation: 0.8s beat;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
 .bomb::after {
   content: '💣'
 }
 
 .block {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  width: 100%;
   background: gray;
 }
+
 
 .block::after {
   content: '壁'
 }
 
+@keyframes fire {
+  0% {
+    transform-origin: bottom;
+    transform: rotateZ(18deg) scale(0.9);
+  }
+
+  100% {
+    transform-origin: bottom;
+    transform: rotateZ(-18deg) scale(1.1);
+  }
+}
+
 .fire {
+  animation: 0.2s fire;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: linear;
   background: transparent;
 }
 

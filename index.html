@@ -15,13 +15,15 @@
       <div v-for="point in points" class="tile">
         <div class="player" v-if="point.x == player.point.x && point.y == player.point.y">
         </div>
-        <div class="bomb" v-for="bomb in bombs" v-if="bomb.point.x === point.x &&  bomb.point.y === point.y">
+        <div class="bomb" v-for="bomb in bombs" v-if="bomb.point.x === point.x &&  bomb.point.y === point.y && !( bomb.point.x === player.point.x && bomb.point.y === player.point.y)">
         </div>
         <div class="fire" v-for="fire in fires" v-if="fire.point.x === point.x && fire.point.y === point.y"></div>
         <div class="block" v-for="block in blocks" v-if="block.x === point.x && block.y === point.y"></div>
       </div>
     </div>
   </div>
+  <div>
+    <p>ASDW:移動　スペース:爆弾を置く</p>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0/dist/vue.js"></script>
   <script src="app.js"></script>

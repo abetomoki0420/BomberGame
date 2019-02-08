@@ -6,20 +6,6 @@ const KEYS = {
   SPACE: 32,
 };
 
-const BLOCKS = [{
-  x: 1,
-  y: 1,
-}, {
-  x: 1,
-  y: 8
-}, {
-  x: 8,
-  y: 1,
-}, {
-  x: 8,
-  y: 8
-}]
-
 function Bomb(id, x, y, power) {
   this.id = id;
   this.point = {
@@ -49,7 +35,6 @@ function Fire(id, x, y) {
       }, 1000);
     })
   }
-
 }
 
 let vm = new Vue({
@@ -92,22 +77,22 @@ let vm = new Vue({
     move(direction) {
       switch (direction) {
         case KEYS.A:
-          if (this.player.point.x !== 0) {
+          if (this.player.point.x !== 0 && !this.existsBlock(this.player.point.x - 1, this.player.point.y)) {
             this.player.point.x--;
           }
           break;
         case KEYS.S:
-          if (this.player.point.y !== 10) {
+          if (this.player.point.y !== 10 && !this.existsBlock(this.player.point.x, this.player.point.y + 1)) {
             this.player.point.y++;
           }
           break;
         case KEYS.D:
-          if (this.player.point.x !== 10) {
+          if (this.player.point.x !== 10 && !this.existsBlock(this.player.point.x + 1, this.player.point.y)) {
             this.player.point.x++;
           }
           break;
         case KEYS.W:
-          if (this.player.point.y !== 0) {
+          if (this.player.point.y !== 0 && !this.existsBlock(this.player.point.x, this.player.point.y - 1)) {
             this.player.point.y--;
           }
           break;
@@ -137,44 +122,84 @@ let vm = new Vue({
         })
         setPoint.isBomb = false;
 
-        // createBomb.createFire(this.fires);
         let createFire = null;
+        let continueDir = {
+          TOP: true,
+          RIGHT: true,
+          DOWN: true,
+          LEFT: true,
+        }
         for (let direction = 0; direction < 4; direction++) {
           id = 0;
+          createFire = null;
           if (this.fires.length > 0) {
             id = Math.max.apply(null, this.fires.map((fire) => fire.id)) + 1;
           }
           for (let i = 0; i < createBomb.power; i++) {
             switch (direction) {
               case 0:
-                createFire = new Fire(id, createBomb.point.x, createBomb.point.y - (i + 1));
-                this.fires.push(createFire);
+                if (!this.existsBlock(createBomb.point.x, createBomb.point.y - (i + 1)) && continueDir.TOP) {
+                  createFire = new Fire(id, createBomb.point.x, createBomb.point.y - (i + 1));
+                  this.fires.push(createFire);
+                } else {
+                  continueDir.TOP = false;
+                }
                 break;
               case 1:
-                createFire = new Fire(id, createBomb.point.x + (i + 1), createBomb.point.y);
-                this.fires.push(createFire);
+                if (!this.existsBlock(createBomb.point.x + (i + 1), createBomb.point.y) && continueDir.RIGHT) {
+                  createFire = new Fire(id, createBomb.point.x + (i + 1), createBomb.point.y);
+                  this.fires.push(createFire);
+                } else {
+                  continueDir.RIGHT = false;
+                }
                 break
               case 2:
-                createFire = new Fire(id, createBomb.point.x, createBomb.point.y + i + 1);
-                this.fires.push(createFire);
+                if (!this.existsBlock(createBomb.point.x, createBomb.point.y + i + 1) && continueDir.DOWN) {
+                  createFire = new Fire(id, createBomb.point.x, createBomb.point.y + i + 1);
+                  this.fires.push(createFire);
+                } else {
+                  continueDir.DOWN = false;
+                }
                 break
               case 3:
-                createFire = new Fire(id, createBomb.point.x - (i + 1), createBomb.point.y);
-                this.fires.push(createFire);
+                if (!this.existsBlock(createBomb.point.x - (i + 1), createBomb.point.y) && continueDir.LEFT) {
+                  createFire = new Fire(id, createBomb.point.x - (i + 1), createBomb.point.y);
+                  this.fires.push(createFire);
+                } else {
+                  continueDir.LEFT = false
+                }
                 break
             }
             id++;
-            createFire.set().then((result) => {
-              this.fires = this.fires.filter((fire) => {
-                return fire.id !== result;
-              })
-
-            })
+            if (createFire) {
+              createFire.set().then((result) => {
+                this.fires = this.fires.filter((fire) => {
+                  return fire.id !== result;
+                })
+              });
+            }
           }
         }
+
+        createFire = new Fire(id, createBomb.point.x, createBomb.point.y);
+        this.fires.push(createFire);
+        createFire.set().then((result) => {
+          this.fires = this.fires.filter((fire) => {
+            return fire.id !== result;
+          })
+        });
       });
+    },
+    existsBlock(x, y) {
+      let isExists = false;
+      this.blocks.forEach(block => {
+        if (block.x === x && block.y === y) {
+          isExists = true;
+        }
+      })
+      return isExists;
     }
-  },
+  }
 })
 
 window.addEventListener('keypress', function (e) {
@@ -186,6 +211,8 @@ window.addEventListener('keypress', function (e) {
       vm.move(e.keyCode);
       break
     case KEYS.SPACE:
+      e.preventDefault();
+
       vm.setBomb();
       break
     default:
